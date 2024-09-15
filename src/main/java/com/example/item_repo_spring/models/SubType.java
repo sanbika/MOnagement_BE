@@ -1,12 +1,10 @@
 package com.example.item_repo_spring.models;
 
-import java.util.*;
 import jakarta.persistence.*;
 
-
 @Entity
-@Table(name="type")
-public class Type {
+@Table(name="sub_type")
+public class SubType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
@@ -14,15 +12,16 @@ public class Type {
     @Column(name="name", unique=true)
     private String name;
 
-    public Type (){
+    @ManyToOne
+    @JoinColumn(name="type_id", nullable = false)
+    private Type type;
 
+
+    public SubType() {
     }
 
-    public Type (Integer id){
+    public SubType(Integer id, String name) {
         this.id = id;
-    }
-
-    public Type(String name) {
         this.name = name;
     }
 
@@ -30,7 +29,7 @@ public class Type {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -41,10 +40,20 @@ public class Type {
     public void setName(String name) {
         this.name = name;
     }
-    
-    @Override
-    public String toString(){
-        return "Type{" + "id" + id + "name" + name;
+
+    public Type getType() {
+        return type;
     }
+
+    public void setType(Type type) {
+        this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return "SubType [id=" + id + ", name=" + name + ", type=" + type + "]";
+    }
+
+    
     
 }
