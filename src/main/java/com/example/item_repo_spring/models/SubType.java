@@ -17,12 +17,12 @@ public class SubType {
     @Column(name="name", unique=true)
     private String name;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne
     @JsonBackReference
     @JoinColumn(name="type_id", nullable = false)
     private Type type;
 
-    @OneToMany(mappedBy = "subType")
+    @OneToMany(mappedBy = "subType", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<Item> items;
 

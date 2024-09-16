@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="Item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "expirDate", "subType"})})
+@Table(name="Item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "expiryDate", "subType"})})
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -16,12 +16,12 @@ public class Item {
     @Column(nullable = false)
     private String name;
 
-    private LocalDate expirDate;
+    private LocalDate expiryDate;
 
     @Column(nullable = false)
     private Integer quantity;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name="sub_type_id", nullable = false)
     @JsonBackReference
     private SubType subType;
@@ -31,9 +31,9 @@ public class Item {
 
     }
     
-    public Item(String name, LocalDate localDate, Integer quantity, SubType subType) {
+    public Item(String name, LocalDate expiryDate, Integer quantity, SubType subType) {
         this.name = name;
-        this.expirDate = localDate;
+        this.expiryDate = expiryDate;
         this.quantity = quantity;
         this.subType = subType;
     }
@@ -54,12 +54,12 @@ public class Item {
         this.name = name;
     }
 
-    public LocalDate getExpirDate() {
-        return expirDate;
+    public LocalDate getExpiryDate() {
+        return expiryDate;
     }
 
-    public void setExpirDate(LocalDate expirDate) {
-        this.expirDate = expirDate;
+    public void setExpiryDate(LocalDate expiryDate) {
+        this.expiryDate = expiryDate;
     }
 
     public Integer getQuantity() {
@@ -80,12 +80,8 @@ public class Item {
 
     @Override
     public String toString() {
-        return "Item [id=" + id + ", name=" + name + ", expirDate=" + expirDate + ", quantity=" + quantity
+        return "Item [id=" + id + ", name=" + name + ", expiryDate=" + expiryDate + ", quantity=" + quantity
                 + ", subType=" + subType + "]";
     }
-
-
-    
-
     
 }

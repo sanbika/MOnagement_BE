@@ -27,18 +27,13 @@ public class ItemController {
 	}
 
     @GetMapping("expire")
-	public List<Item> getExpirItems(@RequestParam("date") LocalDate date){
-		return itemService.getExpirItems(date);
-	}
-
-    @GetMapping("tobuy")
-	public List<Item> getToBuyItems(@RequestParam("quantity") int quantity){
-		return itemService.getToBuyItems(quantity);
+	public List<Item> getExpiryItems(@RequestParam("date") LocalDate date){
+		return itemService.getExpiryItems(date);
 	}
 
     @PostMapping("add")
-    public void addNewItem(@RequestBody Item item){
-        itemService.addNewItem(item);
+    public void addNewItem(@RequestBody(required = true) Map<String, String> bodyContent){
+        itemService.addNewItem(bodyContent);
     }
 
     @DeleteMapping("delete")
@@ -52,16 +47,16 @@ public class ItemController {
     }
 
     @PatchMapping("update")
-    public void putMethodName(
+    public void updateItem(
         @RequestParam("id") Long id, 
         @RequestBody(required = true) Map<String, String> bodyContent) {
 
         itemService.updateItem(
             id, 
             bodyContent.get("name"), 
-            bodyContent.get("expirDate"), 
+            bodyContent.get("expiryDate"), 
             bodyContent.get("quantity"), 
-            bodyContent.get("type")
+            bodyContent.get("sub_type_id")
             );
     }
     

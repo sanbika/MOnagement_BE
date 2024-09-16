@@ -16,7 +16,7 @@ public class Type {
     @Column(name="name", unique=true)
     private String name;
 
-    @OneToMany(mappedBy = "type")
+    @OneToMany(mappedBy = "type", cascade = CascadeType.ALL)
     @JsonManagedReference
     private List<SubType> subTypes;
 

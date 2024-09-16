@@ -12,12 +12,12 @@ import java.time.LocalDate;
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long>{
 
-    // find whether an item exist by name, expirDate and subTypeId
-    Optional<Item> findByNameAndExpirDateAndSubType_Id(String name, LocalDate expirDate, Integer subTypeId);
+    // find whether an item exist by name, expiryDate and subTypeId
+    Optional<Item> findByNameAndExpiryDateAndSubType_Id(String name, LocalDate expiryDate, Integer subTypeId);
 
 
     // find items with epxirDate before the specified date, and sort in ascending order
-    List<Item> findByExpirDateBeforeOrderByExpirDateAsc(LocalDate date);
+    List<Item> findByExpiryDateBeforeOrderByExpiryDateAsc(LocalDate date);
     
     // get all items order by subtype name
     @Query("SELECT i FROM Item i ORDER BY i.subType.name ASC") 

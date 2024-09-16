@@ -1,9 +1,7 @@
 package com.example.item_repo_spring.services;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.time.LocalDate;
-import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -47,21 +45,40 @@ public class ItemService {
 	}
 
 	//Get expire items
-	public List<Item> getExpirItems(LocalDate date){
-		return itemRepository.findByExpirDateBeforeOrderByExpirDateAsc(date);
+	public List<Item> getExpiryItems(LocalDate date){
+		return itemRepository.findByExpiryDateBeforeOrderByExpiryDateAsc(date);
 	}
 
 	//Create a new item
 	@Transactional
-    public void addNewItem(Item item) {
-		Optional<Item> itemOptional = itemRepository.findByNameAndExpirDateAndSubType_Id(item.getName(), item.getExpirDate(), item.getSubType().getId());
+    public void addNewItem(Map<String, String> bodyContent) {
+		// check whether sub type exist.
+		SubType itemSubType = subTypeRepository.findById(Integer.parseInt(bodyContent.get("sub_type_id")))
+		.orElseThrow(() -> new IllegalStateException("Selected sub-type Id does not exist in database"));
+	
+
+		String itemName = bodyContent.get("name");
+		LocalDate itemDate = LocalDate.parse(bodyContent.get("expiryDate"));
+		Integer itemQuantity = Integer.parseInt( bodyContent.get("quantity"));
+
+		// check whether item with specified name, expiry date, sub-subtype exist.
+		Optional<Item> itemOptional = itemRepository.findByNameAndExpiryDateAndSubType_Id(itemName, itemDate, itemSubType.getId());
 
 		if (itemOptional.isPresent()) {
-			throw new IllegalStateException("Item has already existed");
+			throw new IllegalStateException("Item with the same name, expiry date and sub-type already exists. Update quantity instead.");
 		}
-		else {
-			itemRepository.save(item);
-		}
+
+		// Create and save new Item
+		Item item = new Item();
+		item.setName(itemName);
+		item.setExpiryDate(itemDate);
+		item.setSubType(itemSubType);
+		item.setQuantity(itemQuantity);
+	
+		// Save the Item
+		itemRepository.save(item);
+
+
     }
 
 	//Delete an item
@@ -85,55 +102,69 @@ public class ItemService {
 	public void updateItem(
 		Long id, 
 		String newName, 
-		String newExpirDate,
+		String newExpiryDate,
 		String newQuantity,
 		String newSubTypeId)
 		{
 			// Ensure this item exists
-			Optional <Item> itemOptional = itemRepository.findById(id);
+			Optional<Item> itemOptional = itemRepository.findById(id);
 
 			if (itemOptional.isPresent()){
 				Item item = itemOptional.get();
-	
+
 				// Process input and set new values if not null
 				String name = (newName != null && !newName.trim().isEmpty()) ? newName : item.getName();
-				LocalDate expirDate = (newExpirDate != null && !newExpirDate.trim().isEmpty()) ? LocalDate.parse(newExpirDate) : item.getExpirDate();
-				Integer quantity = (newQuantity != null && !newQuantity.trim().isEmpty()) ? Integer.parseInt(newQuantity) : item.getQuantity();
+				LocalDate expiryDate = (newExpiryDate != null && !newExpiryDate.trim().isEmpty()) ? LocalDate.parse(newExpiryDate) : item.getExpiryDate();
 				Integer subTypeId = (newSubTypeId != null && !newSubTypeId.trim().isEmpty()) ? Integer.parseInt(newSubTypeId) : item.getSubType().getId();
+				Integer quantity = (newQuantity != null && !newQuantity.trim().isEmpty()) ? Integer.parseInt(newQuantity) : item.getQuantity();
 
-				// Ensure updated value does not conflict with records in DB
-				Optional<Item> itemSamePropertyOptional = itemRepository.findByNameAndExpirDateAndSubType_Id(
-					name,
-					expirDate, 
-					subTypeId);
-					
-				if (itemSamePropertyOptional.isPresent()) {
-					throw new IllegalArgumentException("The same combination of name, date and sub type exists");
+				// Ensure updated value does not conflict with records in DB(if either property of name/expiryDate/subType is modified)
+				if (
+					(newName != null && !newName.trim().isEmpty())
+				 || (newExpiryDate != null && !newExpiryDate.trim().isEmpty()) 
+				 || (newSubTypeId != null && !newSubTypeId.trim().isEmpty())
+				 
+				 ){
+					Optional<Item> itemSamePropertyOptional = itemRepository.findByNameAndExpiryDateAndSubType_Id(
+						name,
+						expiryDate, 
+						subTypeId);
+
+						if (itemSamePropertyOptional.isPresent()) {
+							throw new IllegalArgumentException("The same combination of name, expiry date and sub type exists");
+						}
+						else{
+							
+							 // Update item attributes if it has changed compared to original attribtue
+							if (!Objects.equals(item.getName(), name)) {
+								item.setName(name);
+							}
+				
+							if (!Objects.equals(item.getExpiryDate(), expiryDate)) {
+								item.setExpiryDate(expiryDate);
+							}
+				
+							if (!Objects.equals(item.getSubType().getId(), subTypeId)) {
+								SubType newSubType = subTypeRepository.findById(subTypeId)
+									.orElseThrow(() -> new IllegalArgumentException("Invalid sub type ID: " + subTypeId));
+								item.setSubType(newSubType);
+							}
+
+							if (!Objects.equals(item.getQuantity(), quantity)) {
+								item.setQuantity(quantity);
+							}
+		
+						}
 				}
 				else{
-					
-					 // Update item attributes if it has changed compared to original attribtue
-					if (!Objects.equals(item.getName(), name)) {
-						item.setName(name);
-					}
-		
-					if (!Objects.equals(item.getExpirDate(), expirDate)) {
-						item.setExpirDate(expirDate);
-					}
-		
+					//if only update quantity, no need to check conflict.
 					if (!Objects.equals(item.getQuantity(), quantity)) {
 						item.setQuantity(quantity);
 					}
-		
-					if (!Objects.equals(item.getSubType().getId(), subTypeId)) {
-						SubType newSubType = subTypeRepository.findById(subTypeId)
-							.orElseThrow(() -> new IllegalArgumentException("Invalid sub type ID: " + subTypeId));
-						item.setSubType(newSubType);
-					}
-					
-					itemRepository.save(item);
-
 				}
+
+				itemRepository.save(item);	
+				
 			}
 							
 			else{
