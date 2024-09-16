@@ -10,27 +10,28 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.item_repo_spring.models.Item;
 import com.example.item_repo_spring.repositories.ItemRepository;
-import com.example.item_repo_spring.repositories.TypeRepository;
+import com.example.item_repo_spring.repositories.SubTypeRepository;
 
 import jakarta.persistence.EntityNotFoundException;
 
-import com.example.item_repo_spring.models.Type;
+import com.example.item_repo_spring.models.SubType;
+
 
 
 @Service
 public class ItemService {
 
 	private final ItemRepository itemRepository;
-	private final TypeRepository typeRepository;
+	private final SubTypeRepository subTypeRepository;
 
-	public ItemService(ItemRepository itemRepository, TypeRepository typeRepository){
+	public ItemService(ItemRepository itemRepository, SubTypeRepository subTypeRepository){
 		this.itemRepository = itemRepository;
-		this.typeRepository = typeRepository;
+		this.subTypeRepository = subTypeRepository;
 	}
 
 	//Get all items
 	public List<Item> getItems(){
-		return itemRepository.findAll();
+		return itemRepository.findAllItemsOrderedBySubType();
 	}
 
 	//Get an item
@@ -47,22 +48,15 @@ public class ItemService {
 
 	//Get expire items
 	public List<Item> getExpirItems(LocalDate date){
-		return itemRepository.findItemsWithExpirDateBefore(date);
-		// return itemRepository.findItemsWithExpirDateBefore(LocalDate.parse(date));
-	}
-
-	//Get tobuy items
-	public List<Item> getToBuyItems(int quantity){
-		return itemRepository.findItemsWithQuantityLessThan(quantity);
-
+		return itemRepository.findByExpirDateBeforeOrderByExpirDateAsc(date);
 	}
 
 	//Create a new item
 	@Transactional
     public void addNewItem(Item item) {
-		boolean exists = itemRepository.existsByNameAndExpirDateAndTypeId(item.getName(), item.getExpirDate(), item.getType().getId(), item.getId());
+		Optional<Item> itemOptional = itemRepository.findByNameAndExpirDateAndSubType_Id(item.getName(), item.getExpirDate(), item.getSubType().getId());
 
-		if (exists) {
+		if (itemOptional.isPresent()) {
 			throw new IllegalStateException("Item has already existed");
 		}
 		else {
@@ -93,7 +87,7 @@ public class ItemService {
 		String newName, 
 		String newExpirDate,
 		String newQuantity,
-		String newTypeId)
+		String newSubTypeId)
 		{
 			// Ensure this item exists
 			Optional <Item> itemOptional = itemRepository.findById(id);
@@ -105,17 +99,16 @@ public class ItemService {
 				String name = (newName != null && !newName.trim().isEmpty()) ? newName : item.getName();
 				LocalDate expirDate = (newExpirDate != null && !newExpirDate.trim().isEmpty()) ? LocalDate.parse(newExpirDate) : item.getExpirDate();
 				Integer quantity = (newQuantity != null && !newQuantity.trim().isEmpty()) ? Integer.parseInt(newQuantity) : item.getQuantity();
-				Integer typeId = (newTypeId != null && !newTypeId.trim().isEmpty()) ? Integer.parseInt(newTypeId) : item.getType().getId();
+				Integer subTypeId = (newSubTypeId != null && !newSubTypeId.trim().isEmpty()) ? Integer.parseInt(newSubTypeId) : item.getSubType().getId();
 
 				// Ensure updated value does not conflict with records in DB
-				boolean exists = itemRepository.existsByNameAndExpirDateAndTypeId(
+				Optional<Item> itemSamePropertyOptional = itemRepository.findByNameAndExpirDateAndSubType_Id(
 					name,
 					expirDate, 
-					typeId,
-					id);
+					subTypeId);
 					
-				if (exists) {
-					throw new IllegalArgumentException("The same combination of name, date and type exists");
+				if (itemSamePropertyOptional.isPresent()) {
+					throw new IllegalArgumentException("The same combination of name, date and sub type exists");
 				}
 				else{
 					
@@ -132,10 +125,10 @@ public class ItemService {
 						item.setQuantity(quantity);
 					}
 		
-					if (!Objects.equals(item.getType().getId(), typeId)) {
-						Type newType = typeRepository.findById(typeId)
-							.orElseThrow(() -> new IllegalArgumentException("Invalid type ID: " + typeId));
-						item.setType(newType);
+					if (!Objects.equals(item.getSubType().getId(), subTypeId)) {
+						SubType newSubType = subTypeRepository.findById(subTypeId)
+							.orElseThrow(() -> new IllegalArgumentException("Invalid sub type ID: " + subTypeId));
+						item.setSubType(newSubType);
 					}
 					
 					itemRepository.save(item);

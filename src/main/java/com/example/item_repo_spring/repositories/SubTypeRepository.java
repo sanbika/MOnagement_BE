@@ -9,9 +9,12 @@ import java.util.*;
 
 import com.example.item_repo_spring.models.SubType;
 import com.example.item_repo_spring.models.Item;
+import java.util.List;
+
 
 @Repository
 public interface SubTypeRepository extends JpaRepository<SubType, Integer> {
+    
     // get items with a specified subtype id
     List<Item> findBySubTypeId(Integer subTypeId);
 

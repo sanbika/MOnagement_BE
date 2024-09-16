@@ -34,12 +34,10 @@ public class TypeService {
     }
 
     public void addNewType(Type type){
-        Optional <Type> typeOptional = typeRepository.findTypeByName(type.getName());
-        if (typeOptional.isPresent()){
-            throw new IllegalStateException("Type name already exists");
-        }
-        else{
+        try {
             typeRepository.save(type);
+        } catch (Exception e) {
+            throw new IllegalStateException(e.getMessage());
         }
     }
 
