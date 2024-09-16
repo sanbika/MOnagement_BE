@@ -2,14 +2,15 @@ package com.example.item_repo_spring.models;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="Item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "expirDate", "type"})})
+@Table(name="Item", uniqueConstraints = {@UniqueConstraint(columnNames = {"name", "expirDate", "subType"})})
 public class Item {
     @Id
-    @SequenceGenerator(name = "item_sequence", sequenceName = "item_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "item_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
@@ -20,20 +21,21 @@ public class Item {
     @Column(nullable = false)
     private Integer quantity;
 
-    @ManyToOne
-    @JoinColumn(name="type_id", nullable = false)
-    private Type type;
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name="sub_type_id", nullable = false)
+    @JsonBackReference
+    private SubType subType;
 
 
     public Item(){
 
     }
     
-    public Item(String name, LocalDate localDate, Integer quantity, Type type) {
+    public Item(String name, LocalDate localDate, Integer quantity, SubType subType) {
         this.name = name;
         this.expirDate = localDate;
         this.quantity = quantity;
-        this.type = type;
+        this.subType = subType;
     }
 
     public Long getId() {
@@ -68,18 +70,20 @@ public class Item {
         this.quantity = quantity;
     }
 
-    public Type getType() {
-        return type;
+    public SubType getSubType() {
+        return subType;
     }
 
-    public void setType(Type type) {
-        this.type = type;
+    public void setSubType(SubType subType) {
+        this.subType = subType;
     }
 
     @Override
     public String toString() {
-        return "Item{" + "id" + id + "name" + name + "expirDate" + expirDate + "quantity" + quantity + "type" + type;
+        return "Item [id=" + id + ", name=" + name + ", expirDate=" + expirDate + ", quantity=" + quantity
+                + ", subType=" + subType + "]";
     }
+
 
     
 

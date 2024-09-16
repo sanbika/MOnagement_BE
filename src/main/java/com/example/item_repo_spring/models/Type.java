@@ -1,7 +1,9 @@
 package com.example.item_repo_spring.models;
 
-import java.util.*;
 import jakarta.persistence.*;
+import java.util.*;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
 @Entity
@@ -13,6 +15,10 @@ public class Type {
 
     @Column(name="name", unique=true)
     private String name;
+
+    @OneToMany(mappedBy = "type")
+    @JsonManagedReference
+    private List<SubType> subTypes;
 
     public Type (){
 
@@ -40,6 +46,10 @@ public class Type {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<SubType> getSubTypes() {
+        return subTypes;
     }
     
     @Override

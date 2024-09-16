@@ -1,6 +1,11 @@
 package com.example.item_repo_spring.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.*;
+import java.util.*;
+
 
 @Entity
 @Table(name="sub_type")
@@ -12,9 +17,14 @@ public class SubType {
     @Column(name="name", unique=true)
     private String name;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonBackReference
     @JoinColumn(name="type_id", nullable = false)
     private Type type;
+
+    @OneToMany(mappedBy = "subType")
+    @JsonManagedReference
+    private List<Item> items;
 
 
     public SubType() {
