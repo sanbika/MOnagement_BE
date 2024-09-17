@@ -31,8 +31,19 @@ public class SubTypeService {
     }
 
      // Method to get subtypes with total item quantities less than a certain value
-    public List<Object[]> getSubTypesWithLimitedItemQuantities(int maxQuantity) {
-        return subTypeRepository.findSubTypesWithLimitedItemQuantities(maxQuantity);
+    public List<Map<String, Object>> getSubTypesWithLimitedItemQuantities(int maxQuantity) {
+        List<Object[]> results = subTypeRepository.findSubTypesWithLimitedItemQuantities(maxQuantity);
+        List<Map<String, Object>> formattedResults = new ArrayList<>();
+
+        // Map returned data into dict
+        for (Object[] result:results){
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("id", result[0]);
+            resultMap.put("name", result[1]);
+            resultMap.put("sum", result[2]);
+            formattedResults.add(resultMap);
+        }
+        return formattedResults;
     }
 
     public SubType getSubType(Integer id){
@@ -85,7 +96,7 @@ public class SubTypeService {
     }
 
     public void updateSubType(Integer id, String name){
-        boolean existed = subTypeRepository.existsById(id);
+        // boolean existed = subTypeRepository.existsById(id);
         // System.out.println(existed);
         SubType subType = subTypeRepository.getReferenceById(id);
         if (!Objects.equals(subType.getName(), name) && name.length() > 0){

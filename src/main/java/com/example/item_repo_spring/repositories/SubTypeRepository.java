@@ -13,9 +13,10 @@ import java.util.List;
 public interface SubTypeRepository extends JpaRepository<SubType, Integer> {
 
     // return a list of subtypes and their corresponding total item quantities.
-    @Query("SELECT s, SUM(i.quantity) FROM SubType s " +
+    // AS operator does not work in JPA
+    @Query("SELECT s.id, s.name, SUM(i.quantity) FROM SubType s " +
         "JOIN s.items i " +
-        "GROUP BY s " +
+        "GROUP BY s.id, s.name " +
         "HAVING SUM(i.quantity) < :maxQuantity " +
         "ORDER BY SUM(i.quantity) ASC")
     List<Object[]> findSubTypesWithLimitedItemQuantities(@Param("maxQuantity") int maxQuantity);

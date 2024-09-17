@@ -30,7 +30,7 @@ public class SubTypeController {
     }
 
     @GetMapping("tobuy")
-    public List<Object[]> getToBuySubTypes(@RequestParam("quantity") Integer quantity) {
+    public List<Map<String, Object>> getToBuySubTypes(@RequestParam("quantity") Integer quantity) {
         return subTypeService.getSubTypesWithLimitedItemQuantities(quantity);
 
     }
