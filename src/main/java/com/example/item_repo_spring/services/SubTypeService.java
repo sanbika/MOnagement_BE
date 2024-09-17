@@ -46,6 +46,26 @@ public class SubTypeService {
         return formattedResults;
     }
 
+    // Method to get subtypes with total item quantities and type
+    public List<Map<String, Object>>findSubTypesWithItemQuantities(){
+        List<Object[]> results = subTypeRepository.findSubTypesWithItemQuantities();
+        List<Map<String, Object>> formattedResults = new ArrayList<>();
+
+        // Map returned data into dict
+        for (Object[] result:results){
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("id", result[0]);
+            resultMap.put("name", result[1]);
+            
+            Type type = (Type) result[2];
+            resultMap.put("type_id", type.getId());
+            Long sumItemsQuantity =  result[3]!=null? (Long) result[3]:0;
+            resultMap.put("sumItemsQuantity", sumItemsQuantity);
+            formattedResults.add(resultMap);
+        }
+        return formattedResults;
+    }
+
     public SubType getSubType(Integer id){
         Optional <SubType> subTypeOptional = subTypeRepository.findById(id);
         if (subTypeOptional.isPresent()){
@@ -55,6 +75,8 @@ public class SubTypeService {
             throw new IllegalTransactionStateException("Sub type does not existed");
         }
     }
+
+    
 
     @Transactional
     public void addNewSubType(Map<String, String> bodyContent){

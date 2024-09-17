@@ -24,6 +24,11 @@ public class SubTypeController {
         return subTypeService.getSubTypes();
     }
 
+    @GetMapping("count")
+    public List<Map<String, Object>>findSubTypesWithItemQuantities(){
+        return subTypeService.findSubTypesWithItemQuantities();
+    }
+
     @GetMapping("find")
     public SubType getSubType(@RequestParam("id") Integer id){
         return subTypeService.getSubType(id);

@@ -20,4 +20,10 @@ public interface SubTypeRepository extends JpaRepository<SubType, Integer> {
         "HAVING SUM(i.quantity) < :maxQuantity " +
         "ORDER BY SUM(i.quantity) ASC")
     List<Object[]> findSubTypesWithLimitedItemQuantities(@Param("maxQuantity") int maxQuantity);
+
+
+    @Query("SELECT s.id, s.name, s.type, SUM(i.quantity) AS sumItemsQuantity FROM SubType s " +
+    "JOIN s.items i " +
+    "GROUP BY s.id, s.name, s.type ")
+    List<Object[]> findSubTypesWithItemQuantities();
 }
