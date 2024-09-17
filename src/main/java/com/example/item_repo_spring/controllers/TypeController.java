@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 
+
 @RestController
 @RequestMapping(path="api/type")
 @CrossOrigin(origins = "*")
@@ -24,6 +25,11 @@ public class TypeController {
         return typeService.getTypes();
     }
 
+    @GetMapping("/count")
+    public List<Map<String, Object>> findTypeWithSubTypesAndItemsQuantities() {
+        return typeService.findTypeWithSubTypesAndItemsQuantities();
+    }
+    
     @GetMapping("/find")
     public Type getType(@RequestParam("id") Integer id) {
         return typeService.getType(id);

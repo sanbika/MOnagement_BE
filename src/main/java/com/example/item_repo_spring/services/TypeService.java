@@ -1,8 +1,6 @@
 package com.example.item_repo_spring.services;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Objects;
+import java.util.*;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
@@ -21,6 +19,25 @@ public class TypeService {
 
     public List<Type> getTypes(){
         return typeRepository.findAll();
+    }
+
+    public List<Map<String,Object>> findTypeWithSubTypesAndItemsQuantities(){
+        List<Object[]> results = typeRepository.findTypeWithSubTypesAndItemsQuantities();
+        List<Map<String, Object>> formattedResults = new ArrayList<>();
+        for (Object[] result:results){
+            Map<String, Object> resultMap = new HashMap<>();
+            resultMap.put("id", result[0]);
+            resultMap.put("name", result[1]);
+
+            Integer sumSubTypesQuantity =  result[2]!=null? (Integer) result[2]:0;
+            Integer sumItemsQuantity =  result[3]!=null? (Integer) result[3]:0;
+
+            resultMap.put("sumSubTypesQuantity", sumSubTypesQuantity);
+            resultMap.put("sumItemsQuantity", sumItemsQuantity);
+            formattedResults.add(resultMap);
+        }
+
+        return formattedResults;
     }
 
     public Type getType(Integer id){
