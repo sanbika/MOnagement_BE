@@ -20,7 +20,7 @@ public interface ItemRepository extends JpaRepository<Item, Long>{
     List<Item> findByExpiryDateBeforeOrderByExpiryDateAsc(LocalDate date);
     
     // get all items order by subtype name
-    @Query("SELECT i FROM Item i ORDER BY i.subType.name ASC") 
+    @Query("SELECT i FROM Item i JOIN FETCH i.subType ORDER BY i.subType.name ASC") 
     List<Item> findAllItemsOrderedBySubType();
     
 }

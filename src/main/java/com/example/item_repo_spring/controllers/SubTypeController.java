@@ -60,7 +60,7 @@ public class SubTypeController {
         @RequestParam("id") Integer id,
         @RequestBody(required = true) Map<String, String> bodyContent){
 
-            subTypeService.updateSubType(id, bodyContent.get("name"));
+            subTypeService.updateSubType(id, bodyContent.get("name"), bodyContent.get("type_id"));
         }
     
     

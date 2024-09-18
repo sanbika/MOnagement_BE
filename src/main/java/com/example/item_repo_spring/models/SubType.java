@@ -1,6 +1,8 @@
 package com.example.item_repo_spring.models;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
@@ -24,6 +26,7 @@ public class SubType {
 
     @OneToMany(mappedBy = "subType", cascade = CascadeType.ALL)
     @JsonManagedReference
+    @JsonIgnore
     private List<Item> items;
 
 

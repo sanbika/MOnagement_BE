@@ -29,8 +29,8 @@ public class TypeService {
             resultMap.put("id", result[0]);
             resultMap.put("name", result[1]);
 
-            Integer sumSubTypesQuantity =  result[2]!=null? (Integer) result[2]:0;
-            Integer sumItemsQuantity =  result[3]!=null? (Integer) result[3]:0;
+            Long sumSubTypesQuantity =  result[2]!=null? (Long) result[2]:0;
+            Long sumItemsQuantity =  result[3]!=null? (Long) result[3]:0;
 
             resultMap.put("sumSubTypesQuantity", sumSubTypesQuantity);
             resultMap.put("sumItemsQuantity", sumItemsQuantity);

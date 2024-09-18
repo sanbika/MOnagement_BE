@@ -3,6 +3,7 @@ package com.example.item_repo_spring.models;
 import jakarta.persistence.*;
 import java.util.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 
@@ -18,6 +19,7 @@ public class Type {
 
     @OneToMany(mappedBy = "type", cascade = CascadeType.ALL)
     @JsonManagedReference
+    @JsonIgnore
     private List<SubType> subTypes;
 
     public Type (){

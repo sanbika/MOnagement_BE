@@ -3,6 +3,7 @@ package com.example.item_repo_spring.models;
 import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.*;
 
@@ -21,9 +22,10 @@ public class Item {
     @Column(nullable = false)
     private Integer quantity;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="sub_type_id", nullable = false)
-    @JsonBackReference
+    // @JsonBackReference
+    @JsonIgnoreProperties("items")
     private SubType subType;
 
 

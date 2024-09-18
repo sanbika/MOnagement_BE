@@ -117,14 +117,33 @@ public class SubTypeService {
         }
     }
 
-    public void updateSubType(Integer id, String name){
-        // boolean existed = subTypeRepository.existsById(id);
-        // System.out.println(existed);
-        SubType subType = subTypeRepository.getReferenceById(id);
-        if (!Objects.equals(subType.getName(), name) && name.length() > 0){
-            subType.setName(name);
+    public void updateSubType(Integer id, String newName, String newTypeId){
+        Optional <SubType> subTypeOptional = subTypeRepository.findById(id);
+        if (subTypeOptional.isPresent()){
+            SubType subType = subTypeOptional.get();
+
+            // Process input and set new values if not null
+            String name = (newName != null && !newName.trim().isEmpty()) ? newName : subType.getName();
+            Integer typeId = (newTypeId != null && !newTypeId.trim().isEmpty()) ?  Integer.parseInt(newTypeId) : subType.getType().getId();
+
+            
+            // If not the same as value in DB, then update that field
+            if (!Objects.equals(subType.getName(), name)){
+                subType.setName(newName);               
+            }
+
+            if (!Objects.equals(subType.getType().getId(), typeId)){
+                Type type = typeRepository.getReferenceById(typeId);
+                subType.setType(type);
+            }
+            
             subTypeRepository.save(subType);
         }
+        
+        else{
+            throw new IllegalTransactionStateException("Sub type not existed");
+        }
+
     }
    
 }
