@@ -23,7 +23,7 @@ public interface SubTypeRepository extends JpaRepository<SubType, Integer> {
 
 
     @Query("SELECT s.id, s.name, s.type, SUM(i.quantity) AS sumItemsQuantity FROM SubType s " +
-    "JOIN s.items i " +
+    "LEFT JOIN s.items i " +
     "GROUP BY s.id, s.name, s.type ")
     List<Object[]> findSubTypesWithItemQuantities();
 }
