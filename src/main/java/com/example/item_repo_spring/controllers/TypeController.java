@@ -49,8 +49,13 @@ public class TypeController {
     }
     
     @DeleteMapping("/delete")
-    public void deletType(@RequestParam("id") Integer id){
+    public void deleteType(@RequestParam("id") Integer id){
         typeService.deleteType(id);
+    }
+
+    @DeleteMapping("/delete/multiple")
+    public void deleteTypes(@RequestBody(required = true) Map<String, List<Integer>> bodyContent){
+        typeService.deleteTypes(bodyContent.get("ids"));
     }
     
 }

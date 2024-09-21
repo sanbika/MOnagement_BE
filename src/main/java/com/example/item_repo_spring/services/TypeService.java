@@ -68,6 +68,14 @@ public class TypeService {
         }
     }
 
+    public void deleteTypes(List<Integer> ids){
+        try {
+            typeRepository.deleteAllById(ids);
+        } catch (Exception e) {
+            throw new IllegalTransactionStateException(e.getMessage());
+        }
+    }
+
     public void updateType(Integer id, String name){
         boolean existed = typeRepository.existsById(id);
         System.out.println(existed);
