@@ -53,7 +53,7 @@ public class ItemService {
 	@Transactional
     public void addNewItem(Map<String, String> bodyContent) {
 		// check whether sub type exist.
-		SubType itemSubType = subTypeRepository.findById(Integer.parseInt(bodyContent.get("sub_type_id")))
+		SubType itemSubType = subTypeRepository.findById(Integer.parseInt(bodyContent.get("subType")))
 		.orElseThrow(() -> new IllegalStateException("Selected sub-type Id does not exist in database"));
 	
 
@@ -106,6 +106,12 @@ public class ItemService {
 		String newQuantity,
 		String newSubTypeId)
 		{
+			
+			// System.out.println(newName);
+			// System.out.println(newExpiryDate);
+			// System.out.println(newQuantity);
+			// System.out.println(newSubTypeId);
+
 			// Ensure this item exists
 			Optional<Item> itemOptional = itemRepository.findById(id);
 

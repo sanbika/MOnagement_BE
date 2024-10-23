@@ -56,7 +56,7 @@ public class ItemController {
             bodyContent.get("name"), 
             bodyContent.get("expiryDate"), 
             bodyContent.get("quantity"), 
-            bodyContent.get("sub_type_id")
+            bodyContent.get("subType")
             );
     }
     

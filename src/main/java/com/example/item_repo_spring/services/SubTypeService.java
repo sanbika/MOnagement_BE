@@ -1,5 +1,6 @@
 package com.example.item_repo_spring.services;
 
+import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties.System;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 
@@ -58,7 +59,7 @@ public class SubTypeService {
             resultMap.put("name", result[1]);
             
             Type type = (Type) result[2];
-            resultMap.put("type_id", type.getId());
+            resultMap.put("type", type);
             Long sumItemsQuantity =  result[3]!=null? (Long) result[3]:0;
             resultMap.put("sumItemsQuantity", sumItemsQuantity);
             formattedResults.add(resultMap);
@@ -82,7 +83,7 @@ public class SubTypeService {
     public void addNewSubType(Map<String, String> bodyContent){
         try {
             
-            Optional <Type> typeOptional = typeRepository.findById(Integer.parseInt(bodyContent.get("type_id")));
+            Optional <Type> typeOptional = typeRepository.findById(Integer.parseInt(bodyContent.get("type")));
         
             if (typeOptional.isPresent()){
                 SubType subType = new SubType();
@@ -125,7 +126,6 @@ public class SubTypeService {
             // Process input and set new values if not null
             String name = (newName != null && !newName.trim().isEmpty()) ? newName : subType.getName();
             Integer typeId = (newTypeId != null && !newTypeId.trim().isEmpty()) ?  Integer.parseInt(newTypeId) : subType.getType().getId();
-
             
             // If not the same as value in DB, then update that field
             if (!Objects.equals(subType.getName(), name)){
@@ -133,8 +133,14 @@ public class SubTypeService {
             }
 
             if (!Objects.equals(subType.getType().getId(), typeId)){
-                Type type = typeRepository.getReferenceById(typeId);
-                subType.setType(type);
+                Optional <Type> typeOptional = typeRepository.findById(typeId);
+                if (typeOptional.isPresent()){
+                    Type type = typeOptional.get();
+                    subType.setType(type);
+                }
+                else {
+                    throw new IllegalTransactionStateException("Type not existed");
+                }
             }
             
             subTypeRepository.save(subType);
